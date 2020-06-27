@@ -30,4 +30,8 @@ public class UserService {
 	public User insert(User user) {
 		return ur.save(user);
 	}
+	
+	public void delete(Long id) {
+		ur.deleteById(id);
+	}
 }
