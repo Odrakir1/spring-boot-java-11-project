@@ -3,6 +3,8 @@ package com.project.practice.services;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -26,8 +28,8 @@ public class UserService {
 
 	public User findById(Long id) {
 		Optional<User> user = ur.findById(id);
-		return user.orElseThrow(()->new ResourceNotFoundException(id));
-		
+		return user.orElseThrow(() -> new ResourceNotFoundException(id));
+
 	}
 
 	public User insert(User user) {
@@ -37,20 +39,23 @@ public class UserService {
 	public void delete(Long id) {
 		try {
 			ur.deleteById(id);
-		}catch(EmptyResultDataAccessException e) {
+		} catch (EmptyResultDataAccessException e) {
 			throw new ResourceNotFoundException(id);
-		}
-		catch(DataIntegrityViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			throw new DatabaseException(e.getMessage());
 		}
-		
-		
+
 	}
 
 	public User update(Long id, User user) {
+		try {
 		User entity = ur.getOne(id);
 		updateUser(entity, user);
 		return ur.save(entity);
+		}
+		catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	private void updateUser(User entity, User user) {
